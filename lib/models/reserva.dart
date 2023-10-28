@@ -7,17 +7,14 @@ class Reserva {
   String idReserva;
   Persona persona;
   Persona doctor;
-  DateTime
-      fecha; //La fecha de finalización es una hora después de la fecha de inicio
-  String horaInicio;
-  String horaFin;
+  DateTime fecha;
+  String horario;
 
   Reserva({
     required this.persona,
     required this.doctor,
     required this.fecha,
-    required this.horaInicio,
-    required this.horaFin,
+    required this.horario,
   }) : idReserva = uuid.v4();
 }
 
