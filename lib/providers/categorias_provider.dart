@@ -1,31 +1,37 @@
-//Provider para las categorias
-import 'package:flutter/material.dart';
+//Utilizando riverpod, podemos crear un provider para las categorias
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:registro_pacientes/models/categoria.dart';
 
-final categoriasProvider = ChangeNotifierProvider<CategoriasProvider>((ref) {
+final categoriasProvider =
+    StateNotifierProvider<CategoriasProvider, List<Categoria>>((ref) {
   return CategoriasProvider();
 });
 
-class CategoriasProvider extends ChangeNotifier {
-  List<Categoria> _categorias = [];
+class CategoriasProvider extends StateNotifier<List<Categoria>> {
+  CategoriasProvider() : super([]);
 
-  List<Categoria> get categorias => _categorias;
-
+  //Agrega una categoria a la lista
   void addCategoria(Categoria categoria) {
-    _categorias.add(categoria);
-    notifyListeners();
+    state = [...state, categoria];
   }
 
+  //Elimina una categoria de la lista
+  void removeCategoria(Categoria categoria) {
+    state = state
+        .where((element) => element.idCategoria != categoria.idCategoria)
+        .toList();
+  }
+
+  //Insertar una categoria en una posicion especifica
+  void insertCategoria(int index, Categoria categoria) {
+    state = [...state.sublist(0, index), categoria, ...state.sublist(index)];
+  }
+
+  //Busca una categoria por su id y la actualiza
   void updateCategoria(Categoria categoria) {
-    final index = _categorias
-        .indexWhere((element) => element.idCategoria == categoria.idCategoria);
-    _categorias[index] = categoria;
-    notifyListeners();
-  }
-
-  void deleteCategoria(String id) {
-    _categorias.removeWhere((element) => element.idCategoria == id);
-    notifyListeners();
+    state = [
+      for (final item in state)
+        if (item.idCategoria == categoria.idCategoria) categoria else item
+    ];
   }
 }

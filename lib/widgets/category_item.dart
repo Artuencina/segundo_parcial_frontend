@@ -1,28 +1,33 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:registro_pacientes/models/categoria.dart';
+import 'package:registro_pacientes/providers/categorias_provider.dart';
 
-class CategoryItem extends StatelessWidget {
+class CategoryItem extends ConsumerWidget {
   const CategoryItem({
     super.key,
     required this.color,
     required this.categoria,
-    required this.onDelete,
     required this.onUpdate,
+    required this.onDelete,
   });
 
   final Color color;
   final Categoria categoria;
 
-  //Metodos
-  final void Function(Categoria) onDelete;
   final void Function(Categoria?) onUpdate;
+  final void Function(Categoria, int) onDelete;
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Dismissible(
       key: ValueKey(categoria.idCategoria),
       onDismissed: (direction) {
-        onDelete(categoria);
+        onDelete(
+            categoria,
+            ref.read(categoriasProvider).indexWhere(
+                  (element) => element.idCategoria == categoria.idCategoria,
+                ));
       },
       direction: DismissDirection.endToStart,
       background: Container(
@@ -74,7 +79,12 @@ class CategoryItem extends StatelessWidget {
                 ),
                 IconButton(
                   onPressed: () {
-                    onDelete(categoria);
+                    onDelete(
+                        categoria,
+                        ref.read(categoriasProvider).indexWhere(
+                              (element) =>
+                                  element.idCategoria == categoria.idCategoria,
+                            ));
                   },
                   icon: const Icon(
                     Icons.delete,

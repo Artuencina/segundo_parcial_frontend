@@ -22,24 +22,21 @@ class TabsScreen extends StatefulWidget {
 class _TabsScreenState extends State<TabsScreen> {
   //Lista de pantallas
   //En teoria esto se puede hacer con route y eso
-  //pero no se como
+  //pero todavia no se como
+
   final List<Widget> screens = [
     CategoriasScreen(
       color: colores[0],
-      categorias: const [],
     ),
     PersonasScreen(
       mainColor: colores[1],
-      personas: const [],
       esDoctor: false,
     ),
     PersonasScreen(
-      personas: const [],
       mainColor: colores[2],
       esDoctor: true,
     ),
     ReservasScreen(
-      reservas: const [],
       color: colores[3],
     ),
     const FichasScreen(),
@@ -48,12 +45,10 @@ class _TabsScreenState extends State<TabsScreen> {
   //Widget principal que se muestra en pantalla
   int activeIndex = 0;
   Widget? activeScreen;
-  Color? activeColor; //Y su color
 
   @override
   void initState() {
     activeScreen = screens[0];
-    activeColor = colores[0];
     super.initState();
   }
 
@@ -62,7 +57,6 @@ class _TabsScreenState extends State<TabsScreen> {
     //Cambiar el estado de la pantalla al tab seleccionado
     setState(() {
       activeIndex = index;
-      activeColor = colores[index];
     });
   }
 
@@ -74,7 +68,7 @@ class _TabsScreenState extends State<TabsScreen> {
     return Scaffold(
       appBar: AppBar(
         title: const Text("Registro de pacientes"),
-        backgroundColor: activeColor,
+        backgroundColor: colores[activeIndex],
         foregroundColor: Colors.white,
         actions: [
           //Boton de filtro que abre un modal de filtro segun la pantalla activa

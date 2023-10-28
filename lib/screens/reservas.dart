@@ -1,70 +1,30 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:registro_pacientes/models/persona.dart';
 import 'package:registro_pacientes/models/reserva.dart';
+import 'package:registro_pacientes/providers/personas_provider.dart';
+import 'package:registro_pacientes/providers/reservas_provider.dart';
 import 'package:registro_pacientes/widgets/reserva_item.dart';
 
-//Esta parte se tiene que hacer con providers pero mientras
-//voy a establecer estaticamente las personas y doctores
-final pacientes = [
-  Persona(
-    nombre: "Juan",
-    telefono: "12345678",
-    apellido: 'Perez',
-    cedula: '12345678',
-    email: '',
-    esDoctor: false,
-  ),
-  Persona(
-    nombre: "Pedro",
-    telefono: "12345678",
-    apellido: 'Perez',
-    cedula: '12345678',
-    email: '',
-    esDoctor: false,
-  ),
-];
-
-List<Persona> doctores = [
-  Persona(
-    nombre: "Roberto",
-    telefono: "12345678",
-    apellido: 'Perez',
-    cedula: '12345678',
-    email: '',
-    esDoctor: true,
-  ),
-  Persona(
-    nombre: "Luis",
-    telefono: "12345678",
-    apellido: 'Perez',
-    cedula: '12345678',
-    email: '',
-    esDoctor: true,
-  ),
-];
-
-class ReservasScreen extends StatefulWidget {
+class ReservasScreen extends ConsumerStatefulWidget {
   const ReservasScreen({
     super.key,
-    required this.reservas,
     required this.color,
   });
 
-  final List<Reserva> reservas;
   final Color color;
 
   @override
-  State<ReservasScreen> createState() => _ReservasScreenState();
+  ConsumerState<ReservasScreen> createState() => _ReservasScreenState();
 }
 
-class _ReservasScreenState extends State<ReservasScreen> {
+class _ReservasScreenState extends ConsumerState<ReservasScreen> {
   DateTime fechaFinal = DateTime.now();
 
   //Metodos
   void _addReserva(Reserva reserva) {
-    setState(() {
-      widget.reservas.add(reserva);
-    });
+    //Agregar la reserva a la lista
+    ref.read(reservasProvider.notifier).addReserva(reserva);
     Navigator.of(context).pop();
 
     ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
@@ -74,13 +34,12 @@ class _ReservasScreenState extends State<ReservasScreen> {
   }
 
   void _deleteReserva(Reserva reserva) {
-    //Indice para hacer undo
-    final index = widget.reservas.indexOf(reserva);
+    final index = ref.read(reservasProvider).indexWhere(
+          (element) => element.idReserva == reserva.idReserva,
+        );
 
-    setState(() {
-      widget.reservas
-          .removeWhere((element) => element.idReserva == reserva.idReserva);
-    });
+    //Eliminar la reserva
+    ref.read(reservasProvider.notifier).removeReserva(reserva);
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -88,9 +47,7 @@ class _ReservasScreenState extends State<ReservasScreen> {
           action: SnackBarAction(
             label: "Deshacer",
             onPressed: () {
-              setState(() {
-                widget.reservas.insert(index, reserva);
-              });
+              ref.read(reservasProvider.notifier).insertReserva(index, reserva);
             },
           )),
     );
@@ -99,11 +56,20 @@ class _ReservasScreenState extends State<ReservasScreen> {
   //Funcion para mostrar un modal para agregar una reserva
   void _showModalReserva() {
     //Modal que permita elegir una persona, un doctor, una fecha y una hora
+
+    Persona? pacienteSeleccionado;
+    Persona? doctorSeleccionado;
+    DateTime fechaSeleccionada = DateTime.now();
+    String horarioSeleccionado = '';
+
     showModalBottomSheet(
+      useSafeArea: true,
+      isScrollControlled: true,
       context: context,
       builder: (context) {
         return Container(
-          padding: const EdgeInsets.all(10),
+          padding: const EdgeInsets.all(30),
+          alignment: Alignment.center,
           child: Column(
             children: [
               const Text(
@@ -120,7 +86,11 @@ class _ReservasScreenState extends State<ReservasScreen> {
                   labelText: "Persona",
                   border: OutlineInputBorder(),
                 ),
-                items: pacientes
+                items: ref
+                    .read(personasProvider)
+                    .where(
+                      (element) => element.esDoctor == false,
+                    )
                     .map(
                       (e) => DropdownMenuItem(
                         value: e,
@@ -128,7 +98,9 @@ class _ReservasScreenState extends State<ReservasScreen> {
                       ),
                     )
                     .toList(),
-                onChanged: (value) {},
+                onChanged: (value) {
+                  pacienteSeleccionado = value as Persona;
+                },
               ),
 
               const SizedBox(height: 10),
@@ -138,7 +110,11 @@ class _ReservasScreenState extends State<ReservasScreen> {
                   labelText: "Doctor",
                   border: OutlineInputBorder(),
                 ),
-                items: doctores
+                items: ref
+                    .read(personasProvider)
+                    .where(
+                      (element) => element.esDoctor == true,
+                    )
                     .map(
                       (e) => DropdownMenuItem(
                         value: e,
@@ -146,9 +122,13 @@ class _ReservasScreenState extends State<ReservasScreen> {
                       ),
                     )
                     .toList(),
-                onChanged: (value) {},
+                onChanged: (value) {
+                  doctorSeleccionado = value as Persona;
+                },
               ),
               const SizedBox(height: 10),
+              //Mostrar la fecha seleccionada
+
               //Elegir fecha
               ElevatedButton(
                 onPressed: () async {
@@ -160,39 +140,76 @@ class _ReservasScreenState extends State<ReservasScreen> {
                     lastDate: DateTime.now().add(const Duration(days: 30)),
                   );
 
-                  //Actualizar el estado de la fecha
-                  setState(() {
-                    widget
-                        .reservas[widget.reservas.indexWhere(
-                      (element) => element.fecha == fecha,
-                    )]
-                        .fecha = fecha!;
-                  });
+                  if (fecha != null) {
+                    fechaSeleccionada = fecha;
+                  }
                 },
                 child: const Text("Elegir fecha"),
               ),
               const SizedBox(height: 10),
-              //Elegir hora con un picker de hora
+              //Elegir hora con un dropdown
               //y luego asignar en el horario
               //de la reserva
-              ElevatedButton(
-                onPressed: () async {
-                  //Mostrar el timepicker
-                  final hora = await showTimePicker(
-                    context: context,
-                    initialTime: TimeOfDay.now(),
-                  );
-
-                  //Actualizar el estado de la hora
-                  setState(() {
-                    widget
-                        .reservas[widget.reservas.indexWhere(
-                      (element) => element.horario == hora!.format(context),
-                    )]
-                        .horario = hora!.format(context);
-                  });
+              DropdownButtonFormField(
+                decoration: const InputDecoration(
+                  labelText: "Horario",
+                  border: OutlineInputBorder(),
+                ),
+                items: horarios
+                    .map(
+                      (e) => DropdownMenuItem(value: e, child: Text(e)),
+                    )
+                    .toList(),
+                onChanged: (value) {
+                  horarioSeleccionado = value as String;
                 },
-                child: const Text("Elegir hora"),
+              ),
+
+              //Botones de aceptar y cancelar
+              const SizedBox(height: 10),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  ElevatedButton(
+                    onPressed: () {
+                      //Validar la reserva
+                      final valido = _validarReserva(
+                          pacienteSeleccionado,
+                          doctorSeleccionado,
+                          fechaSeleccionada,
+                          horarioSeleccionado);
+
+                      if (valido.isNotEmpty) {
+                        //Mostrar mensaje de error
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(valido),
+                            backgroundColor: Colors.red,
+                          ),
+                        );
+                        return;
+                      }
+
+                      final reserva = Reserva(
+                        persona: pacienteSeleccionado!,
+                        doctor: doctorSeleccionado!,
+                        fecha: fechaSeleccionada,
+                        horario: horarioSeleccionado,
+                      );
+
+                      //Agregar reserva
+                      _addReserva(reserva);
+                    },
+                    child: const Text("Aceptar"),
+                  ),
+                  const SizedBox(width: 10),
+                  ElevatedButton(
+                    onPressed: () {
+                      Navigator.of(context).pop();
+                    },
+                    child: const Text("Cancelar"),
+                  ),
+                ],
               ),
             ],
           ),
@@ -202,21 +219,39 @@ class _ReservasScreenState extends State<ReservasScreen> {
   }
 
   //Funcion que valida que la fecha y hora ingresada no exista entre las reservas
-  String _validarReserva(Reserva reserva) {
-    String respuesta = "";
-    //Validar que la fecha no exista
-    for (final reserva in widget.reservas) {
-      if (reserva.fecha == reserva.fecha &&
-          reserva.horario == reserva.horario) {
-        respuesta = "Ya existe una reserva para esa fecha y hora";
-        break;
-      }
+  String _validarReserva(
+      Persona? paciente, Persona? doctor, DateTime fecha, String horario) {
+    //Validar que se seleccionó un paciente
+    if (paciente == null) {
+      return "Debe seleccionar un paciente";
     }
-    return respuesta;
+
+    //Validar que se seleccionó un doctor
+    if (doctor == null) {
+      return "Debe seleccionar un doctor";
+    }
+
+    if (horario.isEmpty) {
+      return "Debe seleccionar un horario";
+    }
+
+    //Validar que no exista un horario para esa fecha
+    final reservas = ref.read(reservasProvider);
+
+    final existeReserva = reservas.any((element) {
+      return element.fecha == fecha && element.horario == horario;
+    });
+
+    if (existeReserva) {
+      return "Ya existe una reserva para ese horario";
+    }
+
+    return '';
   }
 
   @override
   Widget build(BuildContext context) {
+    final reservas = ref.watch(reservasProvider);
     return Scaffold(
       floatingActionButton: FloatingActionButton(
         onPressed: _showModalReserva,
@@ -226,10 +261,10 @@ class _ReservasScreenState extends State<ReservasScreen> {
         child: const Icon(Icons.add),
       ),
       body: ListView.builder(
-        itemCount: widget.reservas.length,
+        itemCount: reservas.length,
         itemBuilder: (context, index) {
           return ReservaItem(
-            reserva: widget.reservas[index],
+            reserva: reservas[index],
             mainColor: widget.color,
           );
         },

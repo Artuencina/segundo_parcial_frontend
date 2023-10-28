@@ -1,29 +1,28 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:registro_pacientes/models/persona.dart';
+import 'package:registro_pacientes/providers/personas_provider.dart';
 import 'package:registro_pacientes/widgets/persona_item.dart';
 
-class PersonasScreen extends StatefulWidget {
+class PersonasScreen extends ConsumerStatefulWidget {
   const PersonasScreen({
     super.key,
-    required this.personas,
     required this.mainColor,
     required this.esDoctor,
   });
 
-  final List<Persona> personas;
   final Color mainColor;
   final bool esDoctor;
 
   @override
-  State<PersonasScreen> createState() => _PersonasScreenState();
+  ConsumerState<PersonasScreen> createState() => _PersonasScreenState();
 }
 
-class _PersonasScreenState extends State<PersonasScreen> {
+class _PersonasScreenState extends ConsumerState<PersonasScreen> {
   void _addPaciente(Persona persona) {
-    setState(() {
-      widget.personas.add(persona);
-    });
+    //Agregar persona al estado
+    ref.read(personasProvider.notifier).addPersona(persona);
+
     Navigator.of(context).pop();
 
     ScaffoldMessenger.of(context).showSnackBar(
@@ -35,21 +34,14 @@ class _PersonasScreenState extends State<PersonasScreen> {
   }
 
   void _updatePaciente(Persona newPersona) {
-    setState(() {
-      widget.personas[widget.personas.indexWhere(
-        (element) => element.idPersona == newPersona.idPersona,
-      )] = newPersona;
-    });
+    ref.read(personasProvider.notifier).updatePersona(newPersona);
   }
 
   void _deletePaciente(Persona persona) {
-    final index = widget.personas.indexOf(persona);
+    final index = ref.read(personasProvider).indexOf(persona);
 
-    setState(() {
-      widget.personas.removeWhere(
-        (element) => element.idPersona == persona.idPersona,
-      );
-    });
+    //Eliminar persona
+    ref.read(personasProvider.notifier).removePersona(persona);
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -57,9 +49,7 @@ class _PersonasScreenState extends State<PersonasScreen> {
         action: SnackBarAction(
           label: "Deshacer",
           onPressed: () {
-            setState(() {
-              widget.personas.insert(index, persona);
-            });
+            ref.read(personasProvider.notifier).insertPersona(index, persona);
           },
         ),
       ),
@@ -196,19 +186,23 @@ class _PersonasScreenState extends State<PersonasScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final personas = ref
+        .watch(personasProvider)
+        .where((element) => element.esDoctor == widget.esDoctor)
+        .toList();
     return Scaffold(
-      body: widget.personas.isEmpty
+      body: personas.isEmpty
           ? Center(
               child:
                   Text("No hay ${widget.esDoctor ? "doctores" : "pacientes"}"),
             )
           : ListView.builder(
-              itemCount: widget.personas.length,
+              itemCount: personas.length,
               itemBuilder: (context, index) {
                 return PersonaItem(
                   icon: widget.esDoctor ? Icons.medical_services : Icons.person,
                   color: widget.mainColor,
-                  persona: widget.personas[index],
+                  persona: personas[index],
                   deletePersona: _deletePaciente,
                   updatePersona: _showModalPersona,
                 );

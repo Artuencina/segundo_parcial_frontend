@@ -1,74 +1,51 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:registro_pacientes/models/categoria.dart';
+import 'package:registro_pacientes/providers/categorias_provider.dart';
 import 'package:registro_pacientes/widgets/category_item.dart';
 
-class CategoriasScreen extends StatefulWidget {
+class CategoriasScreen extends ConsumerStatefulWidget {
   const CategoriasScreen({
     super.key,
     required this.color,
-    required this.categorias,
   });
 
   final Color color;
-  final List<Categoria> categorias;
 
   @override
-  State<CategoriasScreen> createState() => _CategoriasScreenState();
+  ConsumerState<CategoriasScreen> createState() => _CategoriasScreenState();
 }
 
-class _CategoriasScreenState extends State<CategoriasScreen> {
-  void _addCategoria(Categoria categoria) {
-    setState(() {
-      widget.categorias.add(categoria);
-    });
-    Navigator.of(context).pop();
-
-    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-      showCloseIcon: true,
-      content: Text('Categoria agregada'),
-    ));
-  }
-
-  void _deleteCategoria(Categoria categoria) {
-    //Indice para hacer undo
-    final index = widget.categorias.indexOf(categoria);
-
-    setState(() {
-      widget.categorias.removeWhere(
-          (element) => element.idCategoria == categoria.idCategoria);
-    });
-
+class _CategoriasScreenState extends ConsumerState<CategoriasScreen> {
+  //Mostrar mensaje para deshacer la eliminacion de una categoria
+  void _removeCategoria(Categoria categoria, int index) {
+    //Eliminar categoria
+    ref.read(categoriasProvider.notifier).removeCategoria(categoria);
+    //Mostrar mensaje de deshacer
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-          content: const Text('Categoria eliminada'),
-          action: SnackBarAction(
-            label: "Deshacer",
-            onPressed: () {
-              setState(() {
-                widget.categorias.insert(index, categoria);
-              });
-            },
-          )),
+        content: const Text('Categoria eliminada'),
+        action: SnackBarAction(
+          label: "Deshacer",
+          onPressed: () {
+            ref
+                .read(categoriasProvider.notifier)
+                .insertCategoria(index, categoria);
+          },
+        ),
+      ),
     );
   }
 
-  void _updateCategoria(Categoria newCategoria) {
-    //Actualizar estado de la pantalla
-    setState(() {
-      widget.categorias[widget.categorias.indexWhere(
-        (element) => element.idCategoria == newCategoria.idCategoria,
-      )] = newCategoria;
-    });
+  //void _updateCategoria(Categoria newCategoria) {
+  //Actualizar estado de la pantalla
+  //setState(() {
+  //widget.categorias[widget.categorias.indexWhere(
+  //(element) => element.idCategoria == newCategoria.idCategoria,
+  //)] = newCategoria;
+  //});
 
-    //Volver a la pantalla anterior
-    Navigator.of(context).pop();
-
-    //Mostrar mensaje
-    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-      showCloseIcon: true,
-      content: Text('Categoria actualizada'),
-    ));
-  }
+  //}
 
   //Metodo para agregar una categoria
   void _showModalCategoria(Categoria? editCategoria) {
@@ -109,13 +86,30 @@ class _CategoriasScreenState extends State<CategoriasScreen> {
                   onPressed: () {
                     if (editCategoria != null) {
                       editCategoria.descripcion = descripcionController.text;
-                      _updateCategoria(editCategoria);
+                      ref
+                          .read(categoriasProvider.notifier)
+                          .updateCategoria(editCategoria);
+
+                      //Volver a la pantalla anterior
+                      Navigator.of(context).pop();
+
+                      //Mostrar mensaje
+                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                        showCloseIcon: true,
+                        content: Text('Categoria actualizada'),
+                      ));
                     } else {
-                      _addCategoria(
-                        Categoria(
-                          descripcion: descripcionController.text,
-                        ),
-                      );
+                      ref.read(categoriasProvider.notifier).addCategoria(
+                            Categoria(
+                              descripcion: descripcionController.text,
+                            ),
+                          );
+                      Navigator.of(context).pop();
+
+                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                        showCloseIcon: true,
+                        content: Text('Categoria agregada'),
+                      ));
                     }
                   },
                   child: Text(editCategoria != null ? 'Editar' : 'Agregar'),
@@ -137,19 +131,22 @@ class _CategoriasScreenState extends State<CategoriasScreen> {
 
   @override
   Widget build(BuildContext context) {
+    //Obtener lista de categorias
+    final categorias = ref.watch(categoriasProvider);
+
     return Scaffold(
-      body: widget.categorias.isEmpty
+      body: categorias.isEmpty
           ? const Center(
               child: Text('No hay categorias'),
             )
           : ListView.builder(
-              itemCount: widget.categorias.length,
+              itemCount: categorias.length,
               itemBuilder: (context, index) {
                 return CategoryItem(
                   color: widget.color,
-                  categoria: widget.categorias[index],
-                  onDelete: _deleteCategoria,
+                  categoria: categorias[index],
                   onUpdate: _showModalCategoria,
+                  onDelete: _removeCategoria,
                 );
               },
             ),
