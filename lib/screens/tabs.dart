@@ -39,7 +39,9 @@ class _TabsScreenState extends State<TabsScreen> {
     ReservasScreen(
       color: colores[3],
     ),
-    const FichasScreen(),
+    FichasScreen(
+      mainColor: colores[4],
+    )
   ];
 
   //Widget principal que se muestra en pantalla

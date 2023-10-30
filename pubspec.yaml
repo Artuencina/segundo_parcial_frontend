@@ -39,7 +39,6 @@ dependencies:
   uuid: ^4.1.0
   intl: ^0.18.1
   flutter_riverpod: ^2.4.4
-  riverpod_annotation: ^2.2.1
   flip_card: ^0.7.0
 
 dev_dependencies:

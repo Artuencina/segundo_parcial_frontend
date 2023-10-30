@@ -1,6 +1,5 @@
 //Widget para mostrar las reservas en una card que muestra la fecha, la hora y el nombre del paciente. Y que al tocar muestre los demás datos de la reserva además del botón de eliminar.
 
-import 'package:flip_card/flip_card.dart';
 import 'package:flutter/material.dart';
 import 'package:registro_pacientes/models/reserva.dart';
 
@@ -9,47 +8,102 @@ class ReservaItem extends StatelessWidget {
     super.key,
     required this.reserva,
     required this.mainColor,
+    required this.onDelete,
   });
 
   final Color mainColor;
   final Reserva reserva;
+  final void Function(Reserva) onDelete;
 
   @override
   Widget build(BuildContext context) {
-    return FlipCard(
-      fill: Fill.fillBack,
-      direction: FlipDirection.HORIZONTAL,
-      side: CardSide.FRONT,
-      front: Container(
-        margin: const EdgeInsets.all(10),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(10),
-          color: mainColor,
+    return Dismissible(
+      key: ValueKey(reserva.idReserva),
+      direction: DismissDirection.endToStart,
+      background: Container(
+        color: Colors.red,
+        alignment: Alignment.centerRight,
+        padding: const EdgeInsets.only(right: 10),
+        margin: const EdgeInsets.fromLTRB(
+          0,
+          5,
+          10,
+          5,
         ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            const Icon(Icons.calendar_today),
-            Text(reserva.fecha.toString()),
-            const Icon(Icons.timer),
-            Text(reserva.fecha.hour.toString()),
-          ],
+        child: const Icon(
+          Icons.delete,
+          color: Colors.white,
+          size: 40,
         ),
       ),
-      back: Container(
-        margin: const EdgeInsets.all(10),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(10),
-          color: mainColor,
-        ),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            const Icon(Icons.person),
-            Text(reserva.persona.nombre),
-            const Icon(Icons.phone),
-            Text(reserva.persona.telefono),
-          ],
+      onDismissed: (direction) {
+        onDelete(reserva);
+      },
+      child: Card(
+        child: Container(
+          padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 10),
+          margin: const EdgeInsets.all(10),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(10),
+            color: mainColor,
+          ),
+          child: Column(
+            children: [
+              //Mostrar la fecha y la hora
+              Text(
+                "Reserva",
+                style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                    color: Colors.white, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 10),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(Icons.calendar_today, color: Colors.white),
+                  const SizedBox(width: 10),
+                  Text(
+                    '${reserva.fecha.day}/${reserva.fecha.month}/${reserva.fecha.year}',
+                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                          color: Colors.white,
+                        ),
+                  ),
+                  const Spacer(),
+                  const Icon(Icons.timer, color: Colors.white),
+                  const SizedBox(width: 10),
+                  Text(
+                    reserva.horario,
+                    style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                          color: Colors.white,
+                        ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 10),
+              //Mostrar el nombre del paciente y el doctor
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Icon(Icons.person, color: Colors.white),
+                  const SizedBox(width: 10),
+                  Text(
+                    '${reserva.persona.nombre} ${reserva.persona.apellido}',
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: Colors.white,
+                        ),
+                  ),
+                  const Spacer(),
+                  const Icon(Icons.medication, color: Colors.white),
+                  const SizedBox(width: 10),
+                  Text(
+                    '${reserva.doctor.nombre} ${reserva.doctor.apellido}',
+                    style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                          color: Colors.white,
+                        ),
+                  ),
+                ],
+              )
+            ],
+          ),
         ),
       ),
     );

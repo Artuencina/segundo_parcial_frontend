@@ -193,8 +193,19 @@ class _PersonasScreenState extends ConsumerState<PersonasScreen> {
     return Scaffold(
       body: personas.isEmpty
           ? Center(
-              child:
-                  Text("No hay ${widget.esDoctor ? "doctores" : "pacientes"}"),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                      widget.esDoctor
+                          ? Icons.medical_services_outlined
+                          : Icons.person_outline,
+                      size: 100,
+                      color: widget.mainColor),
+                  const SizedBox(height: 10),
+                  Text("No hay ${widget.esDoctor ? 'doctores' : 'pacientes'}"),
+                ],
+              ),
             )
           : ListView.builder(
               itemCount: personas.length,

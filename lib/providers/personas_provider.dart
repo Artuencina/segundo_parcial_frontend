@@ -39,4 +39,34 @@ class PersonasProvider extends StateNotifier<List<Persona>> {
         if (item.cedula == persona.cedula) persona else item
     ];
   }
+
+  //Getters
+  List<Persona> get doctores {
+    return state.where((element) => element.esDoctor).toList();
+  }
+
+  List<Persona> get pacientes {
+    return state.where((element) => !element.esDoctor).toList();
+  }
+
+  //Buscador con filtros
+  List<Persona> searchPersonas(String? nombre_apellido, bool esDoctor,
+      String? cedula, String? telefono) {
+    //Si no hay ningun filtro, retornar la lista completa
+    if (nombre_apellido == null &&
+        cedula == null &&
+        telefono == null &&
+        esDoctor == false) {
+      return state;
+    }
+
+    //Filtrar por nombre y apellido
+    if (nombre_apellido != null) {
+      return state
+          .where((element) =>
+              element.nombre.toLowerCase().contains(nombre_apellido) ||
+              element.apellido.toLowerCase().contains(nombre_apellido))
+          .toList();
+    }
+  }
 }

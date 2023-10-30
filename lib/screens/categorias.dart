@@ -136,8 +136,19 @@ class _CategoriasScreenState extends ConsumerState<CategoriasScreen> {
 
     return Scaffold(
       body: categorias.isEmpty
-          ? const Center(
-              child: Text('No hay categorias'),
+          ? Center(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Icon(
+                    Icons.category_outlined,
+                    size: 100,
+                    color: widget.color,
+                  ),
+                  const SizedBox(height: 10),
+                  const Text("No hay categorías"),
+                ],
+              ),
             )
           : ListView.builder(
               itemCount: categorias.length,
