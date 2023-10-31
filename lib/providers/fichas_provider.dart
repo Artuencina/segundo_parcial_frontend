@@ -2,6 +2,7 @@
 // import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:registro_pacientes/models/ficha.dart';
+import 'package:registro_pacientes/models/filters/FichaFilter.dart';
 
 class FichasNotifier extends StateNotifier<List<Ficha>> {
   FichasNotifier() : super([]);
@@ -26,9 +27,31 @@ class FichasNotifier extends StateNotifier<List<Ficha>> {
       }
     }).toList();
   }
+
+  //Metodo para filtrar las fichas
+  List<Ficha> filterFichas(FichaFilter filter) {
+    return state
+        .where((element) =>
+            (filter.pacientes.isEmpty ||
+                filter.pacientes.contains(element.paciente)) &&
+            (filter.doctores.isEmpty ||
+                filter.doctores.contains(element.doctor)) &&
+            (filter.categorias.isEmpty ||
+                filter.categorias.contains(element.categoria)) &&
+            (filter.fechaInicio == null ||
+                element.fecha.isAfter(filter.fechaInicio!)) &&
+            (filter.fechaFin == null ||
+                element.fecha.isBefore(filter.fechaFin!)))
+        .toList();
+  }
 }
 
 //Provider para las fichas
 final fichasProvider = StateNotifierProvider<FichasNotifier, List<Ficha>>(
   (ref) => FichasNotifier(),
 );
+
+//Provider para filtrar las fichas
+final fichasFilterProvider = StateProvider<FichaFilter>((ref) {
+  return FichaFilter();
+});

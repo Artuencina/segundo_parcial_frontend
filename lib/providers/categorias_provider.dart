@@ -34,4 +34,15 @@ class CategoriasProvider extends StateNotifier<List<Categoria>> {
         if (item.idCategoria == categoria.idCategoria) categoria else item
     ];
   }
+
+  List<Categoria> searchCategorias(String value) {
+    if (value.isEmpty) {
+      return state;
+    }
+
+    return state
+        .where((element) =>
+            element.descripcion.toLowerCase().contains(value.toLowerCase()))
+        .toList();
+  }
 }

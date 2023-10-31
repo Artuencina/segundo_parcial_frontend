@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:registro_pacientes/models/ficha.dart';
+import 'package:registro_pacientes/models/filters/FichaFilter.dart';
 import 'package:registro_pacientes/models/reserva.dart';
 import 'package:registro_pacientes/providers/fichas_provider.dart';
-import 'package:registro_pacientes/providers/reservas_provider.dart';
 import 'package:registro_pacientes/widgets/ficha_item.dart';
+import 'package:registro_pacientes/widgets/filters/ficha_filter.dart';
 import 'package:registro_pacientes/widgets/new_ficha.dart';
 import 'package:registro_pacientes/widgets/reserva_search.dart';
 
@@ -73,11 +74,31 @@ class _FichasScreenState extends ConsumerState<FichasScreen> {
     );
   }
 
+  //Metodo para mostrar la pantalla de filtros
+  //por doctores, pacientes, fecha de inicio, fecha final, y categoria
+  void _showFilter() async {
+    //Mostrar la pantalla con navigator
+    final filtro = await Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) {
+          return FichaFilterScreen(
+              mainColor: widget.mainColor,
+              filter: ref.read(fichasFilterProvider.notifier).state);
+        },
+      ),
+    );
+    //Actualizar el filtro
+    if (filtro != null) {
+      ref.read(fichasFilterProvider.notifier).state = filtro as FichaFilter;
+    }
+  }
+
   //Build
 
   @override
   Widget build(BuildContext context) {
-    final fichas = ref.watch(fichasProvider);
+    final filter = ref.watch(fichasFilterProvider);
+    final fichas = ref.watch(fichasProvider.notifier).filterFichas(filter);
 
     return Scaffold(
       appBar: AppBar(
@@ -88,8 +109,7 @@ class _FichasScreenState extends ConsumerState<FichasScreen> {
           //Boton de filtro
           IconButton(
             onPressed: () {
-              //Abrir cuadro de dialogo para filtrar con un inputtext
-              //y tres checkbox para doctor, paciente y cedula
+              _showFilter();
             },
             icon: const Icon(Icons.filter_alt),
           ),
@@ -107,6 +127,8 @@ class _FichasScreenState extends ConsumerState<FichasScreen> {
             onPressed: () async {
               //Mostrar el dialogo para agregar una ficha
               final reserva = await showModalBottomSheet(
+                  isScrollControlled: true,
+                  useSafeArea: true,
                   context: context,
                   builder: (context) {
                     return const ModalSearchReserva();

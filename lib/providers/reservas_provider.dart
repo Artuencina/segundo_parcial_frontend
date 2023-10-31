@@ -48,14 +48,12 @@ class ReservasProvider extends StateNotifier<List<Reserva>> {
 
       //Si la fecha de inicio es null, no filtrar por fecha
       if (fechaInicio != null) {
-        if (reserva.fecha.isBefore(fechaInicio)) {
-          return false;
-        }
+        return reserva.fecha.isAfter(fechaInicio);
       }
 
       //Si la fecha final es null, no filtrar por fecha
       if (fechaFinal != null) {
-        if (reserva.fecha.isAfter(fechaFinal)) {
+        if (reserva.fecha.isBefore(fechaFinal)) {
           return false;
         }
       }
