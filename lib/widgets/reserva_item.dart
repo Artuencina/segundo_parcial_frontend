@@ -40,13 +40,13 @@ class ReservaItem extends StatelessWidget {
         onDelete(reserva);
       },
       child: Card(
-        child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 15, horizontal: 10),
-          margin: const EdgeInsets.all(10),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(10),
-            color: mainColor,
-          ),
+        color: mainColor,
+        margin: const EdgeInsets.symmetric(
+          horizontal: 10,
+          vertical: 5,
+        ),
+        child: Padding(
+          padding: const EdgeInsets.all(10.0),
           child: Column(
             children: [
               //Mostrar la fecha y la hora

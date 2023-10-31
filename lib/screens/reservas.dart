@@ -106,6 +106,21 @@ class _ReservasScreenState extends ConsumerState<ReservasScreen> {
   Widget build(BuildContext context) {
     final reservas = ref.watch(reservasProvider);
     return Scaffold(
+      appBar: AppBar(
+        title: const Text("Registro de pacientes"),
+        backgroundColor: widget.color,
+        foregroundColor: Colors.white,
+        actions: [
+          //Boton de filtro
+          IconButton(
+            onPressed: () {
+              //Abrir cuadro de dialogo para filtrar con un inputtext
+              //y tres checkbox para doctor, paciente y cedula
+            },
+            icon: const Icon(Icons.filter_alt),
+          ),
+        ],
+      ),
       floatingActionButton: FloatingActionButton(
         onPressed: _showModalReserva,
         backgroundColor: widget.color,

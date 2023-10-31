@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:registro_pacientes/models/persona.dart';
 import 'package:registro_pacientes/models/reserva.dart';
-import 'package:registro_pacientes/providers/personas_provider.dart';
+import 'package:registro_pacientes/widgets/persona_search.dart';
 
 class ModalReserva extends ConsumerStatefulWidget {
   const ModalReserva(
@@ -40,52 +40,94 @@ class _ModalReservaState extends ConsumerState<ModalReserva> {
             ),
           ),
           const SizedBox(height: 10),
-          //Elegir persona
-          DropdownButtonFormField(
-            decoration: const InputDecoration(
-              labelText: "Persona",
-              border: OutlineInputBorder(),
-            ),
-            items: ref
-                .read(personasProvider)
-                .where(
-                  (element) => element.esDoctor == false,
-                )
-                .map(
-                  (e) => DropdownMenuItem(
-                    value: e,
-                    child: Text('${e.nombre} ${e.apellido}'),
+          //Elegir persona con un textfield y un boton que
+          //abre el modal de busqueda
+          Row(
+            children: [
+              Expanded(
+                child: TextFormField(
+                  readOnly: true,
+                  decoration: const InputDecoration(
+                    labelText: "Paciente",
+                    border: OutlineInputBorder(),
                   ),
-                )
-                .toList(),
-            onChanged: (value) {
-              pacienteSeleccionado = value as Persona;
-            },
+                  controller: TextEditingController(
+                    text: pacienteSeleccionado == null
+                        ? ''
+                        : '${pacienteSeleccionado!.nombre} ${pacienteSeleccionado!.apellido}',
+                  ),
+                ),
+              ),
+              const SizedBox(width: 10),
+              ElevatedButton(
+                onPressed: () async {
+                  //Mostrar el modal de busqueda
+                  final persona = await showModalBottomSheet<Persona>(
+                    isScrollControlled: true,
+                    useSafeArea: true,
+                    context: context,
+                    builder: (context) {
+                      return const ModalSearchPersona(
+                        buscarPacientes: true,
+                      );
+                    },
+                  );
+
+                  if (persona != null) {
+                    setState(() {
+                      pacienteSeleccionado = persona;
+                    });
+                  }
+                },
+                child: const Text("Buscar"),
+              ),
+            ],
           ),
 
           const SizedBox(height: 10),
           //Elegir doctor
-          DropdownButtonFormField(
-            decoration: const InputDecoration(
-              labelText: "Doctor",
-              border: OutlineInputBorder(),
-            ),
-            items: ref
-                .read(personasProvider)
-                .where(
-                  (element) => element.esDoctor == true,
-                )
-                .map(
-                  (e) => DropdownMenuItem(
-                    value: e,
-                    child: Text('${e.nombre} ${e.apellido}'),
+          Row(
+            children: [
+              Expanded(
+                child: TextFormField(
+                  readOnly: true,
+                  decoration: const InputDecoration(
+                    labelText: "Doctor",
+                    border: OutlineInputBorder(),
                   ),
-                )
-                .toList(),
-            onChanged: (value) {
-              doctorSeleccionado = value as Persona;
-            },
+                  controller: TextEditingController(
+                    text: doctorSeleccionado == null
+                        ? ''
+                        : '${doctorSeleccionado!.nombre} ${doctorSeleccionado!.apellido}',
+                  ),
+                ),
+              ),
+              const SizedBox(width: 10),
+              ElevatedButton(
+                onPressed: () async {
+                  //Mostrar el modal de busqueda
+                  final persona = await showModalBottomSheet<Persona>(
+                    isScrollControlled: true,
+                    useSafeArea: true,
+                    context: context,
+                    builder: (context) {
+                      return const ModalSearchPersona(
+                        buscarPacientes: false,
+                      );
+                    },
+                  );
+
+                  if (persona != null) {
+                    setState(() {
+                      doctorSeleccionado = persona;
+                    });
+                  }
+                },
+                child: const Text("Buscar"),
+              ),
+            ],
           ),
+
           const SizedBox(height: 10),
           //Mostrar la fecha seleccionada
           Text(

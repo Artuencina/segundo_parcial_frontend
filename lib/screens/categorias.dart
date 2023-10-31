@@ -135,6 +135,20 @@ class _CategoriasScreenState extends ConsumerState<CategoriasScreen> {
     final categorias = ref.watch(categoriasProvider);
 
     return Scaffold(
+      appBar: AppBar(
+        title: const Text("Registro de pacientes"),
+        backgroundColor: widget.color,
+        foregroundColor: Colors.white,
+        actions: [
+          //Boton de filtro
+          IconButton(
+            onPressed: () {
+              //Abrir modal de filtro
+            },
+            icon: const Icon(Icons.filter_alt),
+          ),
+        ],
+      ),
       body: categorias.isEmpty
           ? Center(
               child: Column(

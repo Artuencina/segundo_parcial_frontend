@@ -50,23 +50,36 @@ class PersonasProvider extends StateNotifier<List<Persona>> {
   }
 
   //Buscador con filtros
-  List<Persona> searchPersonas(String? nombre_apellido, bool esDoctor,
-      String? cedula, String? telefono) {
+  List<Persona> searchPersonas(
+      String valueSearch, bool esDoctor, bool esPaciente, bool onlyCedula) {
     //Si no hay ningun filtro, retornar la lista completa
-    if (nombre_apellido == null &&
-        cedula == null &&
-        telefono == null &&
-        esDoctor == false) {
+    if (valueSearch.isEmpty && esDoctor == false && esPaciente == false) {
       return state;
     }
 
-    //Filtrar por nombre y apellido
-    if (nombre_apellido != null) {
-      return state
-          .where((element) =>
-              element.nombre.toLowerCase().contains(nombre_apellido) ||
-              element.apellido.toLowerCase().contains(nombre_apellido))
-          .toList();
-    }
+    valueSearch = valueSearch.toLowerCase();
+    //Filtrar por nombre, apellido o cedula pero si cedula es true
+    //entonces filtrar solo por cedula
+    //ademas, filtrar por si es doctor o paciente
+    return state.where((element) {
+      final nombre = element.nombre.toLowerCase();
+      final apellido = element.apellido.toLowerCase();
+      final cedula = element.cedula.toLowerCase();
+
+      final nombreCompleto = '$nombre $apellido';
+
+      if (onlyCedula) {
+        //Buscar solamente por cedula
+        return cedula.contains(valueSearch) &&
+            ((esDoctor && element.esDoctor) ||
+                (esPaciente && !element.esDoctor) ||
+                (!esDoctor && !esPaciente));
+      }
+      return (nombreCompleto.contains(valueSearch) ||
+              (cedula.contains(valueSearch))) &&
+          ((esDoctor && element.esDoctor) ||
+              (esPaciente && !element.esDoctor) ||
+              (!esDoctor && !esPaciente));
+    }).toList();
   }
 }

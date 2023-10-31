@@ -6,6 +6,7 @@ import 'package:registro_pacientes/providers/fichas_provider.dart';
 import 'package:registro_pacientes/providers/reservas_provider.dart';
 import 'package:registro_pacientes/widgets/ficha_item.dart';
 import 'package:registro_pacientes/widgets/new_ficha.dart';
+import 'package:registro_pacientes/widgets/reserva_search.dart';
 
 class FichasScreen extends ConsumerStatefulWidget {
   const FichasScreen({
@@ -79,6 +80,21 @@ class _FichasScreenState extends ConsumerState<FichasScreen> {
     final fichas = ref.watch(fichasProvider);
 
     return Scaffold(
+      appBar: AppBar(
+        title: const Text("Registro de pacientes"),
+        backgroundColor: widget.mainColor,
+        foregroundColor: Colors.white,
+        actions: [
+          //Boton de filtro
+          IconButton(
+            onPressed: () {
+              //Abrir cuadro de dialogo para filtrar con un inputtext
+              //y tres checkbox para doctor, paciente y cedula
+            },
+            icon: const Icon(Icons.filter_alt),
+          ),
+        ],
+      ),
       //Mostrar dos floating action buttons
       //Uno es para agregar uno nuevo
       //Y otro es para crear a partir de una reserva
@@ -88,9 +104,16 @@ class _FichasScreenState extends ConsumerState<FichasScreen> {
         mainAxisAlignment: MainAxisAlignment.end,
         children: [
           FloatingActionButton(
-            onPressed: () {
+            onPressed: () async {
               //Mostrar el dialogo para agregar una ficha
-              _showModalFicha(ref.read(reservasProvider).first);
+              final reserva = await showModalBottomSheet(
+                  context: context,
+                  builder: (context) {
+                    return const ModalSearchReserva();
+                  });
+              if (reserva != null) {
+                _showModalFicha(reserva);
+              }
             },
             backgroundColor: widget.mainColor,
             foregroundColor: Colors.white,

@@ -68,29 +68,6 @@ class _TabsScreenState extends State<TabsScreen> {
     activeScreen = screens[activeIndex];
 
     return Scaffold(
-      appBar: AppBar(
-        title: const Text("Registro de pacientes"),
-        backgroundColor: colores[activeIndex],
-        foregroundColor: Colors.white,
-        actions: [
-          //Boton de filtro que abre un modal de filtro segun la pantalla activa
-          IconButton(
-            onPressed: () {
-              //Abrir modal de filtro
-            },
-            icon: const Icon(Icons.filter_alt),
-          ),
-
-          //Boton para exportar solo si es la ventana de fichas
-          if (activeIndex == 4)
-            IconButton(
-              onPressed: () {
-                //Exportar fichas
-              },
-              icon: const Icon(Icons.exit_to_app),
-            ),
-        ],
-      ),
       bottomNavigationBar: BottomNavigationBar(
         backgroundColor: Colors.white60,
         type: BottomNavigationBarType.shifting,

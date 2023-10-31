@@ -191,6 +191,21 @@ class _PersonasScreenState extends ConsumerState<PersonasScreen> {
         .where((element) => element.esDoctor == widget.esDoctor)
         .toList();
     return Scaffold(
+      appBar: AppBar(
+        title: const Text("Registro de pacientes"),
+        backgroundColor: widget.mainColor,
+        foregroundColor: Colors.white,
+        actions: [
+          //Boton de filtro
+          IconButton(
+            onPressed: () {
+              //Abrir cuadro de dialogo para filtrar con un inputtext
+              //y tres checkbox para doctor, paciente y cedula
+            },
+            icon: const Icon(Icons.filter_alt),
+          ),
+        ],
+      ),
       body: personas.isEmpty
           ? Center(
               child: Column(
