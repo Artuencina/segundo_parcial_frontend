@@ -3,7 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:registro_pacientes/models/ficha.dart';
 import 'package:registro_pacientes/models/filters/ficha_filter.dart';
 import 'package:registro_pacientes/models/reserva.dart';
+import 'package:registro_pacientes/providers/excelexport.dart';
 import 'package:registro_pacientes/providers/fichas_provider.dart';
+import 'package:registro_pacientes/screens/pdfpreview.dart';
 import 'package:registro_pacientes/widgets/ficha_item.dart';
 import 'package:registro_pacientes/screens/filters/ficha_filter.dart';
 import 'package:registro_pacientes/widgets/new_ficha.dart';
@@ -24,7 +26,9 @@ class _FichasScreenState extends ConsumerState<FichasScreen> {
   //Metodos
   void _deleteFicha(Ficha ficha) {
     //Eliminar ficha
-    ref.read(fichasProvider.notifier).deleteFicha(ficha);
+    setState(() {
+      ref.read(fichasProvider.notifier).deleteFicha(ficha);
+    });
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -32,7 +36,9 @@ class _FichasScreenState extends ConsumerState<FichasScreen> {
         action: SnackBarAction(
           label: "Deshacer",
           onPressed: () {
-            ref.read(fichasProvider.notifier).addFicha(ficha);
+            setState(() {
+              ref.read(fichasProvider.notifier).addFicha(ficha);
+            });
           },
         ),
       ),
@@ -42,7 +48,9 @@ class _FichasScreenState extends ConsumerState<FichasScreen> {
   //Metodo para agregar una ficha
   void _addFicha(Ficha ficha) {
     //Agregar ficha al estado
-    ref.read(fichasProvider.notifier).addFicha(ficha);
+    setState(() {
+      ref.read(fichasProvider.notifier).addFicha(ficha);
+    });
 
     Navigator.of(context).pop();
 
@@ -112,6 +120,82 @@ class _FichasScreenState extends ConsumerState<FichasScreen> {
               _showFilter();
             },
             icon: const Icon(Icons.filter_alt),
+          ),
+          //Boton para exportar a pdf
+          IconButton(
+              icon: const Icon(Icons.picture_as_pdf, color: Colors.white),
+              //Si no hay fichas, deshabilitar el boton
+              onPressed: fichas.isEmpty
+                  ? null
+                  :
+                  //Mostrar dialogo para confirmar la exportacion
+
+                  () {
+                      showDialog(
+                        context: context,
+                        builder: (context) {
+                          return AlertDialog(
+                            title: const Text("Exportar a PDF"),
+                            content:
+                                const Text("¿Desea exportar las fichas a PDF?"),
+                            actions: [
+                              TextButton(
+                                onPressed: () {
+                                  Navigator.of(context).pop();
+                                },
+                                child: const Text("Cancelar"),
+                              ),
+                              TextButton(
+                                onPressed: () async {
+                                  //Obtener el pdf
+
+                                  //Mostrar el pdf
+                                  Navigator.of(context).push(
+                                    MaterialPageRoute(
+                                      builder: (context) {
+                                        return PdfPreviewScreen(
+                                          fichas: fichas,
+                                        );
+                                      },
+                                    ),
+                                  );
+                                },
+                                child: const Text("Exportar"),
+                              ),
+                            ],
+                          );
+                        },
+                      );
+                    }),
+          //Boton para exportar a excel
+          IconButton(
+            icon: const Icon(Icons.table_rows_rounded, color: Colors.white),
+            onPressed: () {
+              showDialog(
+                  context: context,
+                  builder: (context) {
+                    return AlertDialog(
+                      title: const Text("Exportar a Excel"),
+                      content:
+                          const Text("¿Desea exportar las fichas a Excel?"),
+                      actions: [
+                        TextButton(
+                          onPressed: () {
+                            Navigator.of(context).pop();
+                          },
+                          child: const Text("Cancelar"),
+                        ),
+                        TextButton(
+                          onPressed: () {
+                            exportExcel(fichas);
+                            Navigator.of(context).pop();
+                          },
+                          child: const Text("Exportar"),
+                        ),
+                      ],
+                    );
+                  });
+            },
           ),
         ],
       ),

@@ -15,7 +15,7 @@ class ModalSearchCategoria extends ConsumerStatefulWidget {
 
 class _CategoriaSearchState extends ConsumerState<ModalSearchCategoria> {
   //Variables
-  TextEditingController _controller = TextEditingController();
+  final TextEditingController _controller = TextEditingController();
 
   //Metodos
   Widget _buildSearchBar() {

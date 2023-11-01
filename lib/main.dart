@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:registro_pacientes/screens/tabs.dart';
+import 'package:registro_pacientes/screens/splash.dart';
 
 //Definicion de temas
 final lightTheme = ThemeData(
@@ -26,12 +26,14 @@ final darkTheme = ThemeData(
 );
 
 void main() {
+  //Ensure initialized
+  WidgetsFlutterBinding.ensureInitialized();
   runApp(ProviderScope(
     child: MaterialApp(
       theme: lightTheme,
       darkTheme: darkTheme,
       themeMode: ThemeMode.light,
-      home: const TabsScreen(),
+      home: const SplashScreen(segundos: 2),
     ),
   ));
 }

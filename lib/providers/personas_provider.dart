@@ -104,8 +104,8 @@ class PersonasProvider extends StateNotifier<List<Persona>> {
       final nombreCompleto = '$nombre $apellido';
 
       return (nombreCompleto
-                  .contains(personaFilter.nombreApellido.toLowerCase()) ||
-              (cedula.contains(personaFilter.cedula.toLowerCase())) ||
+                  .contains(personaFilter.nombreApellido.toLowerCase()) &&
+              (cedula.contains(personaFilter.cedula.toLowerCase())) &&
               (email.contains(personaFilter.email.toLowerCase()))) &&
           (element.esDoctor == esDoctor);
     }).toList();

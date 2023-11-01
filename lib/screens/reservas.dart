@@ -26,7 +26,11 @@ class _ReservasScreenState extends ConsumerState<ReservasScreen> {
   //Metodos
   void _addReserva(Reserva reserva) {
     //Agregar la reserva a la lista
-    ref.read(reservasProvider.notifier).addReserva(reserva);
+
+    setState(() {
+      ref.read(reservasProvider.notifier).addReserva(reserva);
+    });
+
     Navigator.of(context).pop();
 
     ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
@@ -41,7 +45,9 @@ class _ReservasScreenState extends ConsumerState<ReservasScreen> {
         );
 
     //Eliminar la reserva
-    ref.read(reservasProvider.notifier).removeReserva(reserva);
+    setState(() {
+      ref.read(reservasProvider.notifier).removeReserva(reserva);
+    });
 
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
@@ -49,7 +55,11 @@ class _ReservasScreenState extends ConsumerState<ReservasScreen> {
           action: SnackBarAction(
             label: "Deshacer",
             onPressed: () {
-              ref.read(reservasProvider.notifier).insertReserva(index, reserva);
+              setState(() {
+                ref
+                    .read(reservasProvider.notifier)
+                    .insertReserva(index, reserva);
+              });
             },
           )),
     );
@@ -94,7 +104,8 @@ class _ReservasScreenState extends ConsumerState<ReservasScreen> {
     final reservas = ref.read(reservasProvider);
 
     final existeReserva = reservas.any((element) {
-      return element.fecha == fecha && element.horario == horario;
+      return DateUtils.isSameDay(element.fecha, fecha) &&
+          element.horario == horario;
     });
 
     if (existeReserva) {
@@ -119,8 +130,10 @@ class _ReservasScreenState extends ConsumerState<ReservasScreen> {
       (value) {
         //Actualizar el filtro
         if (value != null) {
-          ref.read(reservasFilterProvider.notifier).state =
-              value as ReservaFilter;
+          setState(() {
+            ref.read(reservasFilterProvider.notifier).state =
+                value as ReservaFilter;
+          });
         }
       },
     );
@@ -128,7 +141,7 @@ class _ReservasScreenState extends ConsumerState<ReservasScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final filtro = ref.read(reservasFilterProvider.notifier).state;
+    final filtro = ref.watch(reservasFilterProvider.notifier).state;
 
     final reservas =
         ref.watch(reservasProvider.notifier).reservasFiltradas(filtro);

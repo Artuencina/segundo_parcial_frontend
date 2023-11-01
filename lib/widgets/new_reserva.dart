@@ -192,12 +192,23 @@ class _ModalReservaState extends ConsumerState<ModalReserva> {
                       horarioSeleccionado);
 
                   if (valido.isNotEmpty) {
-                    //Mostrar mensaje de error
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: Text(valido),
-                        backgroundColor: Colors.red,
-                      ),
+                    //Mostrar mensaje de error en un dialog
+                    showDialog(
+                      context: context,
+                      builder: (context) {
+                        return AlertDialog(
+                          title: const Text("Error"),
+                          content: Text(valido),
+                          actions: [
+                            ElevatedButton(
+                              onPressed: () {
+                                Navigator.of(context).pop();
+                              },
+                              child: const Text("Aceptar"),
+                            ),
+                          ],
+                        );
+                      },
                     );
                     return;
                   }

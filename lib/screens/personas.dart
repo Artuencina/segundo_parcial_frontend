@@ -22,8 +22,10 @@ class PersonasScreen extends ConsumerStatefulWidget {
 
 class _PersonasScreenState extends ConsumerState<PersonasScreen> {
   void _addPaciente(Persona persona) {
-    //Agregar persona al estado
-    ref.read(personasProvider.notifier).addPersona(persona);
+    setState(() {
+      //Agregar persona al estado
+      ref.read(personasProvider.notifier).addPersona(persona);
+    });
 
     Navigator.of(context).pop();
 
@@ -36,22 +38,27 @@ class _PersonasScreenState extends ConsumerState<PersonasScreen> {
   }
 
   void _updatePaciente(Persona newPersona) {
-    ref.read(personasProvider.notifier).updatePersona(newPersona);
+    setState(() {
+      ref.read(personasProvider.notifier).updatePersona(newPersona);
+    });
   }
 
   void _deletePaciente(Persona persona) {
     final index = ref.read(personasProvider).indexOf(persona);
 
-    //Eliminar persona
-    ref.read(personasProvider.notifier).removePersona(persona);
-
+    setState(() {
+      //Eliminar persona
+      ref.read(personasProvider.notifier).removePersona(persona);
+    });
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
         content: Text('${widget.esDoctor ? 'Doctor' : 'Paciente'} eliminado'),
         action: SnackBarAction(
           label: "Deshacer",
           onPressed: () {
-            ref.read(personasProvider.notifier).insertPersona(index, persona);
+            setState(() {
+              ref.read(personasProvider.notifier).insertPersona(index, persona);
+            });
           },
         ),
       ),
@@ -203,24 +210,26 @@ class _PersonasScreenState extends ConsumerState<PersonasScreen> {
     );
 
     if (filtro != null) {
-      ref
-          .read(esDoctor
-              ? doctorFilterProvider.notifier
-              : pacienteFilterProvider.notifier)
-          .state = filtro as PersonaFilter;
+      setState(() {
+        ref
+            .read(esDoctor
+                ? doctorFilterProvider.notifier
+                : pacienteFilterProvider.notifier)
+            .state = filtro as PersonaFilter;
+      });
     }
   }
 
   @override
   Widget build(BuildContext context) {
     final filtro = ref
-        .read(widget.esDoctor
+        .watch(widget.esDoctor
             ? doctorFilterProvider.notifier
             : pacienteFilterProvider.notifier)
         .state;
 
     final personas = ref
-        .read(personasProvider.notifier)
+        .watch(personasProvider.notifier)
         .searchPersonasFilter(filtro, widget.esDoctor);
 
     return Scaffold(
