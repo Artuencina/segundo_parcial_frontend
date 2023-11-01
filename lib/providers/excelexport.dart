@@ -10,6 +10,10 @@ import 'package:registro_pacientes/models/ficha.dart';
 
 Future<bool> exportExcel(List<Ficha> fichas) async {
   var excel = Excel.createExcel();
+
+  //Eliminar la hoja por defecto
+  excel.delete('Sheet1');
+
   Sheet sheet = excel['Fichas'];
 
   //En la hoja, cargar todos los datos de las fichas
@@ -26,11 +30,11 @@ Future<bool> exportExcel(List<Ficha> fichas) async {
   for (final ficha in fichas) {
     sheet.appendRow([
       ficha.fecha.toString(),
-      ficha.paciente.nombre,
-      ficha.doctor.nombre,
+      '${ficha.paciente.nombre} ${ficha.paciente.apellido}',
+      '${ficha.doctor.nombre} ${ficha.doctor.apellido}',
       ficha.motivo,
       ficha.diagnostico,
-      ficha.categoria,
+      ficha.categoria.descripcion,
       ficha.horario,
     ]);
   }
