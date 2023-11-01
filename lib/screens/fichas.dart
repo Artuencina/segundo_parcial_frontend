@@ -64,9 +64,6 @@ class _FichasScreenState extends ConsumerState<FichasScreen> {
 
   //Metodo para mostrar el modal para agregar una ficha sin reserva
   void _showModalFicha(Reserva? reserva) {
-    //Si reserva no es null, abrir el buscador de reservas
-    if (reserva != null) {}
-
     //Mostrar el modal para agregar una ficha
     showModalBottomSheet(
       useSafeArea: true,

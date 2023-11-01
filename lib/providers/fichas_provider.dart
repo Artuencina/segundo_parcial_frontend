@@ -1,5 +1,6 @@
 //Provider para las fichas
 // import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:registro_pacientes/models/ficha.dart';
 import 'package:registro_pacientes/models/filters/ficha_filter.dart';
@@ -39,9 +40,11 @@ class FichasNotifier extends StateNotifier<List<Ficha>> {
             (filter.categorias.isEmpty ||
                 filter.categorias.contains(element.categoria)) &&
             (filter.fechaInicio == null ||
-                element.fecha.isAfter(filter.fechaInicio!)) &&
+                element.fecha.isAfter(filter.fechaInicio!) ||
+                DateUtils.isSameDay(element.fecha, filter.fechaInicio)) &&
             (filter.fechaFin == null ||
-                element.fecha.isBefore(filter.fechaFin!)))
+                element.fecha.isBefore(filter.fechaFin!) ||
+                DateUtils.isSameDay(element.fecha, filter.fechaFin)))
         .toList();
   }
 }

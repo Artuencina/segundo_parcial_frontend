@@ -12,9 +12,7 @@ Future<bool> exportExcel(List<Ficha> fichas) async {
   var excel = Excel.createExcel();
 
   //Eliminar la hoja por defecto
-  excel.delete('Sheet1');
-
-  Sheet sheet = excel['Fichas'];
+  Sheet sheet = excel['Sheet1'];
 
   //En la hoja, cargar todos los datos de las fichas
   sheet.appendRow([

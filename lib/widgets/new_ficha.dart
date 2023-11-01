@@ -6,6 +6,7 @@ import 'package:registro_pacientes/models/persona.dart';
 import 'package:registro_pacientes/models/reserva.dart';
 import 'package:registro_pacientes/providers/categorias_provider.dart';
 import 'package:registro_pacientes/providers/personas_provider.dart';
+import 'package:registro_pacientes/providers/reservas_provider.dart';
 
 class ModalFicha extends ConsumerStatefulWidget {
   const ModalFicha({
@@ -302,6 +303,13 @@ class _ModalFichaState extends ConsumerState<ModalFicha> {
 
                   //Agregar la ficha
                   widget.addFicha(ficha);
+
+                  //Si reserva no es nulo, eliminarlo
+                  if (widget.reserva != null) {
+                    ref.read(reservasProvider.notifier).removeReserva(
+                          widget.reserva!,
+                        );
+                  }
                 },
                 child: const Text("Agregar"),
               ),
