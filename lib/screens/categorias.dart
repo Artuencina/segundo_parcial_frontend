@@ -139,15 +139,6 @@ class _CategoriasScreenState extends ConsumerState<CategoriasScreen> {
         title: const Text("Registro de pacientes"),
         backgroundColor: widget.color,
         foregroundColor: Colors.white,
-        actions: [
-          //Boton de filtro
-          IconButton(
-            onPressed: () {
-              //Abrir modal de filtro
-            },
-            icon: const Icon(Icons.filter_alt),
-          ),
-        ],
       ),
       body: categorias.isEmpty
           ? Center(

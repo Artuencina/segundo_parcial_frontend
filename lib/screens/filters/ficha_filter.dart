@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:registro_pacientes/models/categoria.dart';
-import 'package:registro_pacientes/models/filters/FichaFilter.dart';
+import 'package:registro_pacientes/models/filters/ficha_filter.dart';
 import 'package:registro_pacientes/models/persona.dart';
 import 'package:registro_pacientes/widgets/categoria_search.dart';
 import 'package:registro_pacientes/widgets/persona_search.dart';

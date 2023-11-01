@@ -1,5 +1,6 @@
 //Statenotifier para las personas
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:registro_pacientes/models/filters/persona_filter.dart';
 import 'package:registro_pacientes/models/persona.dart';
 
 final personasProvider =
@@ -49,7 +50,7 @@ class PersonasProvider extends StateNotifier<List<Persona>> {
     return state.where((element) => !element.esDoctor).toList();
   }
 
-  //Buscador con filtros
+  //Buscador con valores
   List<Persona> searchPersonas(
       String valueSearch, bool esDoctor, bool esPaciente, bool onlyCedula) {
     //Si no hay ningun filtro, retornar la lista completa
@@ -82,4 +83,52 @@ class PersonasProvider extends StateNotifier<List<Persona>> {
               (!esDoctor && !esPaciente));
     }).toList();
   }
+
+  //Buscador con objeto filtro
+  List<Persona> searchPersonasFilter(
+      PersonaFilter personaFilter, bool esDoctor) {
+    //Si no hay ningun filtro, retornar la lista completa
+    if (personaFilter.cedula.isEmpty &&
+        personaFilter.email.isEmpty &&
+        personaFilter.nombreApellido.isEmpty) {
+      return state.where((element) => element.esDoctor == esDoctor).toList();
+    }
+
+    //Filtrar por nombreapellido, cedula, email y si es doctor o paciente
+    return state.where((element) {
+      final nombre = element.nombre.toLowerCase();
+      final apellido = element.apellido.toLowerCase();
+      final cedula = element.cedula.toLowerCase();
+      final email = element.email.toLowerCase();
+
+      final nombreCompleto = '$nombre $apellido';
+
+      return (nombreCompleto
+                  .contains(personaFilter.nombreApellido.toLowerCase()) ||
+              (cedula.contains(personaFilter.cedula.toLowerCase())) ||
+              (email.contains(personaFilter.email.toLowerCase()))) &&
+          (element.esDoctor == esDoctor);
+    }).toList();
+  }
 }
+
+//Stateprovider para los filtros de personas
+final pacienteFilterProvider = StateProvider<PersonaFilter>((ref) {
+  return PersonaFilter(
+    nombreApellido: '',
+    email: '',
+    telefono: '',
+    cedula: '',
+    esDoctor: false,
+  );
+});
+
+final doctorFilterProvider = StateProvider<PersonaFilter>((ref) {
+  return PersonaFilter(
+    nombreApellido: '',
+    email: '',
+    telefono: '',
+    cedula: '',
+    esDoctor: true,
+  );
+});

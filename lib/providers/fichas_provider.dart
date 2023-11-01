@@ -2,7 +2,7 @@
 // import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:registro_pacientes/models/ficha.dart';
-import 'package:registro_pacientes/models/filters/FichaFilter.dart';
+import 'package:registro_pacientes/models/filters/ficha_filter.dart';
 
 class FichasNotifier extends StateNotifier<List<Ficha>> {
   FichasNotifier() : super([]);

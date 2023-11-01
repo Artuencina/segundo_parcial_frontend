@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:registro_pacientes/models/filters/reserva_filter.dart';
 import 'package:registro_pacientes/models/persona.dart';
 import 'package:registro_pacientes/models/reserva.dart';
 import 'package:registro_pacientes/providers/reservas_provider.dart';
+import 'package:registro_pacientes/screens/filters/reserva_filter.dart';
 import 'package:registro_pacientes/widgets/new_reserva.dart';
 import 'package:registro_pacientes/widgets/reserva_item.dart';
 
@@ -102,9 +104,35 @@ class _ReservasScreenState extends ConsumerState<ReservasScreen> {
     return '';
   }
 
+  //Mostrar pantalla de filtros
+  void _showFilters() async {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) {
+          return ReservaFilterScreen(
+            mainColor: widget.color,
+            reservaFilter: ref.read(reservasFilterProvider.notifier).state,
+          );
+        },
+      ),
+    ).then(
+      (value) {
+        //Actualizar el filtro
+        if (value != null) {
+          ref.read(reservasFilterProvider.notifier).state =
+              value as ReservaFilter;
+        }
+      },
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
-    final reservas = ref.watch(reservasProvider);
+    final filtro = ref.read(reservasFilterProvider.notifier).state;
+
+    final reservas =
+        ref.watch(reservasProvider.notifier).reservasFiltradas(filtro);
+
     return Scaffold(
       appBar: AppBar(
         title: const Text("Registro de pacientes"),
@@ -114,8 +142,7 @@ class _ReservasScreenState extends ConsumerState<ReservasScreen> {
           //Boton de filtro
           IconButton(
             onPressed: () {
-              //Abrir cuadro de dialogo para filtrar con un inputtext
-              //y tres checkbox para doctor, paciente y cedula
+              _showFilters();
             },
             icon: const Icon(Icons.filter_alt),
           ),

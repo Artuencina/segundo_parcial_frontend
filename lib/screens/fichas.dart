@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:registro_pacientes/models/ficha.dart';
-import 'package:registro_pacientes/models/filters/FichaFilter.dart';
+import 'package:registro_pacientes/models/filters/ficha_filter.dart';
 import 'package:registro_pacientes/models/reserva.dart';
 import 'package:registro_pacientes/providers/fichas_provider.dart';
 import 'package:registro_pacientes/widgets/ficha_item.dart';
-import 'package:registro_pacientes/widgets/filters/ficha_filter.dart';
+import 'package:registro_pacientes/screens/filters/ficha_filter.dart';
 import 'package:registro_pacientes/widgets/new_ficha.dart';
 import 'package:registro_pacientes/widgets/reserva_search.dart';
 

@@ -1,5 +1,6 @@
 //Statenotifier para manejar las reservas
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:registro_pacientes/models/filters/reserva_filter.dart';
 import 'package:registro_pacientes/models/persona.dart';
 import 'package:registro_pacientes/models/reserva.dart';
 
@@ -61,4 +62,13 @@ class ReservasProvider extends StateNotifier<List<Reserva>> {
       return true;
     }).toList();
   }
+
+  List<Reserva> reservasFiltradas(ReservaFilter filtro) {
+    return searchReservas(
+        filtro.paciente, filtro.doctor, filtro.fechaInicio, filtro.fechaFin);
+  }
 }
+
+//Provider para filtro
+final reservasFilterProvider =
+    StateProvider<ReservaFilter>((ref) => ReservaFilter());

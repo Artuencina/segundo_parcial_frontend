@@ -35,6 +35,7 @@ class CategoriasProvider extends StateNotifier<List<Categoria>> {
     ];
   }
 
+  //Busca una categoria por su nombre
   List<Categoria> searchCategorias(String value) {
     if (value.isEmpty) {
       return state;

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:registro_pacientes/models/filters/persona_filter.dart';
 import 'package:registro_pacientes/models/persona.dart';
 import 'package:registro_pacientes/providers/personas_provider.dart';
+import 'package:registro_pacientes/screens/filters/persona_filter.dart';
 import 'package:registro_pacientes/widgets/persona_item.dart';
 
 class PersonasScreen extends ConsumerStatefulWidget {
@@ -63,6 +65,7 @@ class _PersonasScreenState extends ConsumerState<PersonasScreen> {
     return regex.hasMatch(email);
   }
 
+  //Modal para agregar y editar personas
   void _showModalPersona(Persona? editPersona) {
     TextEditingController nombreController = TextEditingController(
       text: editPersona != null ? editPersona.nombre : "",
@@ -184,12 +187,42 @@ class _PersonasScreenState extends ConsumerState<PersonasScreen> {
     );
   }
 
+  //Pagina de filtros
+  void _showFilters(bool esDoctor) async {
+    final filtro = await Navigator.of(context).push(
+      MaterialPageRoute(builder: (context) {
+        return PersonaFilterScreen(
+          mainColor: widget.mainColor,
+          personaFilter: ref
+              .read(esDoctor
+                  ? doctorFilterProvider.notifier
+                  : pacienteFilterProvider.notifier)
+              .state,
+        );
+      }),
+    );
+
+    if (filtro != null) {
+      ref
+          .read(esDoctor
+              ? doctorFilterProvider.notifier
+              : pacienteFilterProvider.notifier)
+          .state = filtro as PersonaFilter;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
+    final filtro = ref
+        .read(widget.esDoctor
+            ? doctorFilterProvider.notifier
+            : pacienteFilterProvider.notifier)
+        .state;
+
     final personas = ref
-        .watch(personasProvider)
-        .where((element) => element.esDoctor == widget.esDoctor)
-        .toList();
+        .read(personasProvider.notifier)
+        .searchPersonasFilter(filtro, widget.esDoctor);
+
     return Scaffold(
       appBar: AppBar(
         title: const Text("Registro de pacientes"),
@@ -199,8 +232,7 @@ class _PersonasScreenState extends ConsumerState<PersonasScreen> {
           //Boton de filtro
           IconButton(
             onPressed: () {
-              //Abrir cuadro de dialogo para filtrar con un inputtext
-              //y tres checkbox para doctor, paciente y cedula
+              _showFilters(widget.esDoctor);
             },
             icon: const Icon(Icons.filter_alt),
           ),
