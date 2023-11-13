@@ -30,6 +30,7 @@ void main() {
   WidgetsFlutterBinding.ensureInitialized();
   runApp(ProviderScope(
     child: MaterialApp(
+      debugShowCheckedModeBanner: false,
       theme: lightTheme,
       darkTheme: darkTheme,
       themeMode: ThemeMode.light,

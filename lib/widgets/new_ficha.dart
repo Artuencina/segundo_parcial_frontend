@@ -17,7 +17,7 @@ class ModalFicha extends ConsumerStatefulWidget {
   });
 
   final Color mainColor;
-  final void Function(Ficha) addFicha;
+  final void Function(Ficha, Reserva?) addFicha;
   final Reserva?
       reserva; //Este valor es por si se quiere agregar una ficha con reserva
 
@@ -302,7 +302,7 @@ class _ModalFichaState extends ConsumerState<ModalFicha> {
                   );
 
                   //Agregar la ficha
-                  widget.addFicha(ficha);
+                  widget.addFicha(ficha, widget.reserva);
 
                   //Si reserva no es nulo, eliminarlo
                   if (widget.reserva != null) {

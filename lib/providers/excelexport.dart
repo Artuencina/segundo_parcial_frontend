@@ -1,5 +1,4 @@
 //Funcion para exportar a excel
-import 'dart:developer';
 
 import 'package:excel/excel.dart';
 import 'package:open_file/open_file.dart';

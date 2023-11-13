@@ -5,6 +5,7 @@ import 'package:registro_pacientes/models/filters/ficha_filter.dart';
 import 'package:registro_pacientes/models/reserva.dart';
 import 'package:registro_pacientes/providers/excelexport.dart';
 import 'package:registro_pacientes/providers/fichas_provider.dart';
+import 'package:registro_pacientes/providers/reservas_provider.dart';
 import 'package:registro_pacientes/screens/pdfpreview.dart';
 import 'package:registro_pacientes/widgets/ficha_item.dart';
 import 'package:registro_pacientes/screens/filters/ficha_filter.dart';
@@ -46,10 +47,14 @@ class _FichasScreenState extends ConsumerState<FichasScreen> {
   }
 
   //Metodo para agregar una ficha
-  void _addFicha(Ficha ficha) {
+  void _addFicha(Ficha ficha, Reserva? reserva) {
     //Agregar ficha al estado
     setState(() {
       ref.read(fichasProvider.notifier).addFicha(ficha);
+
+      if (reserva != null) {
+        ref.read(reservasProvider.notifier).removeReserva(reserva);
+      }
     });
 
     Navigator.of(context).pop();
